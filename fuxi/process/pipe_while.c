@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+void fun1(int signo)
+{
+
+}
+void fun2(int signo)
+{
+
+}
+
+int main(int argc, const char *argv[])
+{
+	pid_t pid;
+	int fd[2];
+	pipe(fd);
+	char bufw[50];
+//	memset(bufw,'\0',50);
+	char bufr[50];
+	pid = fork();
+	
+	if (pid == -1)
+	{}
+	else if (pid ==0 )
+	{
+#if 1
+		close(fd[0]);
+		while(1)
+		{
+			fgets(bufw,20,stdin);
+
+			if (strcmp(bufw,"quit\n") == 0)
+				exit(0);
+			write(fd[1],bufw,20);
+			kill(getppid(),SIGUSR1);
+			signal(SIGUSR2,fun2);
+			pause();
+
+		}
+#endif
+	}
+	else 
+	{
+		close(fd[1]);
+		while(1)
+		{
+			
+			signal(SIGUSR1,fun1);
+			pause();
+			read(fd[0],bufr,20);
+			printf("%s",bufr);
+			kill(pid,SIGUSR2);
+		}
+	}
+	return 0;
+}
